@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Herriot — Dream Watch List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f7f5f2;
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding: 48px 32px 64px;
+  }
+
+  .page {
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  header {
+    padding-bottom: 28px;
+    border-bottom: 1px solid #d8d4ce;
+    margin-bottom: 36px;
+  }
+
+  .gang-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 10px;
+  }
+
+  .header-main {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    color: #1a1a1a;
+    line-height: 1;
+  }
+
+  .totals {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .totals-label { font-size: 12px; color: #999; font-weight: 400; }
+  .totals-pipe  { font-size: 12px; color: #ccc; }
+  .totals-value { font-size: 13px; font-weight: 500; color: #555; }
+  .totals-type  { font-size: 11px; color: #aaa; font-weight: 400; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid #e8e4de;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+
+  .card-img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #f9f8f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-bottom: 1px solid #f0ede8;
+    position: relative;
+  }
+
+  .card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 20px;
+    transition: transform 0.3s ease;
+  }
+
+  /* Urwerk: crop mode — cover hides the black side bars, white bg fills any gaps */
+  .card-img.crop {
+    background: #fff;
+  }
+  .card-img.crop img {
+    object-fit: cover;
+    padding: 0;
+  }
+
+  .card:hover .card-img img {
+    transform: scale(1.04);
+  }
+
+  .card-img .no-img {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: #ccc;
+  }
+
+  .card-img .no-img svg { width: 36px; height: 36px; }
+  .card-img .no-img span { font-size: 11px; letter-spacing: 0.05em; }
+
+  .card-body {
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .card-cat {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #2563eb;
+    margin-bottom: 5px;
+  }
+
+  .card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: #1a1a1a;
+    line-height: 1.25;
+    margin-bottom: 4px;
+  }
+
+  .card-maker {
+    font-size: 11.5px;
+    color: #888;
+    font-weight: 400;
+    margin-bottom: 0;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f0ede8;
+  }
+
+  .card-price { font-size: 12px; font-weight: 500; color: #666; }
+  .card-price-label { font-size: 10px; font-weight: 400; color: #bbb; margin-right: 5px; letter-spacing: 0.04em; }
+
+  @media (max-width: 800px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    h1 { font-size: 32px; }
+  }
+
+  @media (max-width: 500px) {
+    .grid { grid-template-columns: 1fr; }
+    body { padding: 28px 16px 48px; }
+  }
+
+  .card-img .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(20, 20, 20, 0.82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .card-img:hover .overlay {
+    opacity: 1;
+  }
+
+  .overlay-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    font-weight: 600;
+    font-style: italic;
+    color: #f0ece4;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .sort-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: #888;
+    background: #fff;
+    border: 1px solid #e0dcd6;
+    border-radius: 20px;
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .sort-btn:hover {
+    border-color: #bbb;
+    color: #444;
+  }
+  .sort-btn.active {
+    background: #1a1a1a;
+    border-color: #1a1a1a;
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <p class="gang-label">Singapore Watch Gang — Dream List</p>
+    <div class="header-main">
+      <h1>Herriot</h1>
+      <div class="totals">
+        <span class="totals-label">Total spend</span>
+        <span class="totals-pipe">|</span>
+        <span class="totals-value">SGD 831,535</span>
+        <span class="totals-type">Retail</span>
+        <span class="totals-pipe">|</span>
+        <span class="totals-value">SGD 923,990</span>
+        <span class="totals-type">Resale</span>
+      </div>
+    </div>
+  </header>
+
+  <div style="display:flex; align-items:center; gap:10px; margin-bottom:24px;">
+    <span style="font-size:11px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:#999;">Sort by price</span>
+    <button onclick="sortWatches('default')" id="btn-default" class="sort-btn active">Default</button>
+    <button onclick="sortWatches('asc')"    id="btn-asc"     class="sort-btn">Low to high</button>
+    <button onclick="sortWatches('desc')"   id="btn-desc"    class="sort-btn">High to low</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+</div>
+
+<script>
+const watches = [
+  { cat: "1. Dress",              name: "Chronomètre Bleu",                  maker: "F.P. Journe",         price: 47749,  img: "https://www.fpjourne.com/sites/default/files/styles/image_de_montre/public/declination/FPJ-Co-ImageHD-ChronoBleu-2.png?itok=1SIe6wlJ",      note: "The dial, an icon, one I was offered for SGD 75k, how I laughed at the time — I would triple that now but it's simply stunning." },
+  { cat: "2. The gold watch",     name: "Historiques 222",                   maker: "Vacheron Constantin", price: 111000, img: "https://www.vacheron-constantin.com/dam/rcq/vac/23/09/17/0/2309170.png.transform.vacdetailhd.png",                                          note: "An icon of the 1970s and a bracelet that is second to none." },
+  { cat: "3. Dive",               name: "Overseas Blue",                     maker: "Vacheron Constantin", price: 38600,  img: "https://www.vacheron-constantin.com/dam/rcq/vac/os/Cb/fi/ew/uU/ym/am/PZ/Qu/r_/NQ/osCbfiewuUymamPZQur_NQ.png.transform.vacdetailhd.png",   note: "Technically not a dive watch but very water resistant — the one I actually bought and never wore but would love to own again some day!" },
+  { cat: "4. Field",              name: "Type 11 Latte",                     maker: "Ressence",            price: 40106,  img: "https://ressencewatches.com/cdn/shop/files/RessenceTYPE11Latte-Front_1800x1800.jpg?v=1775047306",                                          note: "Not sure this is really a field watch but it is innovative — ceramic balls for the power reserve, amazing." },
+  { cat: "5. Pilot",              name: "Chronograph 41 Top Gun Ceratanium", maker: "IWC",                 price: 18000,  img: "https://img.iwc.com/product-slideshow-2xl-1/o-dpr-2/a0926488a50dc01d8e5dc1f093df99a2ea663a14.jpg",                                        note: "I love the more 'stealth' colour options that IWC are now doing on their pilots watches, the green on green Woodland edition is also stunning." },
+  { cat: "6. Chronograph",        name: "Datograph Up/Down",                 maker: "A. Lange & Söhne",    price: 185769, img: "https://img.alange-soehne.com/product-light-box-2/o-dpr-2/43bdf72a71cbd782af8b9ae1e861235bd0b82340.jpg",                                   note: "Love the red white and blue, sheer luxury of it all — the caseback and just how over the top it feels." },
+  { cat: "7. GMT / Travel",       name: "Duoface Small Seconds",             maker: "Jaeger-LeCoultre",    price: 19500,  img: "https://img.jaeger-lecoultre.com/product-light-box-1/o-dpr-2/67024e30d460dbd10601eed58f205ff0ef0f9f24.jpg",                                 note: "It has to be a Duoface dual time zone Reverso — timeless elegance." },
+  { cat: "8. Racing",             name: "Historiques American 1921",         maker: "Vacheron Constantin", price: 61500,  img: "https://www.vacheron-constantin.com/dam/rcq/vac/Wj/2u/zl/1l/Ri/W8/PA/9h/zl/xB/PA/Wj2uzl1lRiW8PA9hzlxBPA.png.transform.vacdetailhd.png",   note: "A phantom — until they make a widely available piece that leans left and not right, this remains a very beautiful dream." },
+  { cat: "9. Everyday / Sport",   name: "Sport Traveller",                   maker: "Laurent Ferrier",     price: 99594,  img: "https://laurentferrier.ch/cdn/shop/files/Laurent-Ferrier_Sport-Traveller_Slate-Grey_LCF045.T1.NG1C7_Front-Soldat_1200x.png?v=1775637811",  note: "I love dream lists where wildly expensive pieces like this can be called 'every day' — love the retro feel and legibility of this dual time zone dial." },
+  { cat: "10. Luxury sports",     name: "Square Micro Rotor Blue",           maker: "Laurent Ferrier",     price: 125717, img: "https://laurentferrier.ch/cdn/shop/products/Laurent-Ferrier_Square-Micro-Rotor-Blue_Watch_LCF013.AC.CG2_Front-Soldat-Big_1200x.png?v=1642756447", note: "The most expensive watch I have ever had on my wrist — felt fantastic, I love the hour and minute hands, size and overall finishing." },
+  { cat: "11. Digital / Smart / Tool", name: "UR-102 Reloaded Black",       maker: "Urwerk",              price: 46000,  img: "https://www.urwerk.com/sites/default/files/styles/square_ps/public/gallery/ur-102_reloaded_black_pr.png?itok=yfLMp3vD", crop: true,          note: "Subtle by Urwerk standards, elegant and no nonsense." },
+  { cat: "12. The extra watch",   name: "Saltarello",                        maker: "Vacheron Constantin", price: 38000,  img: "https://backend.lombard-perspectiva.ru/storage/images/clock/assets/5025a15c600101d90841ff0ee0c00e11_xxl.webp",                               note: "Pure jump hour elegance, beautiful guilloche dial — perhaps a bit small for my wrist but this isn't about being sensible!" }
+];
+
+const clockSVG = `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="17" stroke="#d0ccc6" stroke-width="1.5"/><circle cx="20" cy="20" r="2" fill="#d0ccc6"/><line x1="20" y1="8" x2="20" y2="20" stroke="#d0ccc6" stroke-width="1.5" stroke-linecap="round"/><line x1="20" y1="20" x2="28" y2="20" stroke="#d0ccc6" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+
+const originalOrder = [...watches];
+const grid = document.getElementById('grid');
+
+function renderGrid(list) {
+  grid.innerHTML = '';
+  list.forEach(w => {
+  const price = w.price.toLocaleString('en-SG');
+
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const imgWrap = document.createElement('div');
+  imgWrap.className = w.crop ? 'card-img crop' : 'card-img';
+
+  const img = document.createElement('img');
+  img.src = w.img;
+  img.alt = w.name;
+  img.loading = 'lazy';
+  img.addEventListener('error', () => {
+    const fallback = document.createElement('div');
+    fallback.className = 'no-img';
+    fallback.innerHTML = clockSVG + '<span>Image unavailable</span>';
+    imgWrap.replaceChild(fallback, img);
+  });
+  imgWrap.appendChild(img);
+
+  if (w.note) {
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    const txt = document.createElement('p');
+    txt.className = 'overlay-text';
+    txt.textContent = w.note;
+    overlay.appendChild(txt);
+    imgWrap.appendChild(overlay);
+  }
+
+  const body = document.createElement('div');
+  body.className = 'card-body';
+  body.innerHTML = `
+    <p class="card-cat">${w.cat}</p>
+    <p class="card-name">${w.name}</p>
+    <p class="card-maker">${w.maker}</p>
+    <div class="card-footer">
+      <span class="card-price"><span class="card-price-label">RRP SGD</span>${price}</span>
+    </div>`;
+
+  card.appendChild(imgWrap);
+  card.appendChild(body);
+    grid.appendChild(card);
+  });
+}
+
+function sortWatches(order) {
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + order).classList.add('active');
+  let sorted;
+  if (order === 'asc')     sorted = [...watches].sort((a,b) => a.price - b.price);
+  else if (order === 'desc') sorted = [...watches].sort((a,b) => b.price - a.price);
+  else                     sorted = [...originalOrder];
+  renderGrid(sorted);
+}
+
+renderGrid(watches);
+</script>
+</body>
+</html>
